@@ -30,6 +30,10 @@ Encore
 
 // allow sass/scss files to be processed
 // .enableSassLoader()
+
+    .configureFilenames({
+        images: '[path][name].[hash:8].[ext]',
+})
 ;
 
 // export the final configuration

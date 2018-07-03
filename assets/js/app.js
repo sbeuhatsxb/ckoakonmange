@@ -1,7 +1,7 @@
 // assets/js/app.js
 require('../css/app.min.css');
 require('../css/bootstrap.min.css');
-
+require('../img/tasteofparis.jpg');
 // loads the jquery package from node_modules
 const $ = require('jquery');
 

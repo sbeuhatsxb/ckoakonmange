@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
+{% block title %} Hello {{ controller_name }}!{% endblock %}
 
 {% block body %}
 
@@ -14,14 +14,14 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
-                    <!-- <li class="nav-item">
-                      <a class="nav-link" href="index.html">Home</a>
-                    </li> -->
-                    <!-- <li class="nav-item">
-                      <a class="nav-link" href="about.html">About</a>
-                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="https://galek.spyzone.fr/" target="_blank">Votez</a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="#" method="post">
+                            <input type="hidden" name="refresh" value="refreshed">
+                            <button value="refresh" class="btn btn-default" type="submit">Refresh</button>
+                        </form>
                     </li>
                     <!-- <li class="nav-item">
                       <a class="nav-link" href="contact.html">Contact</a>
@@ -32,14 +32,14 @@
     </nav>
 
     <!-- Page Header -->
-    <header class="masthead" style="background-image: {{ asset('build/tasteofparis.jpg') }}">
+    <header class="masthead" style="background-image: url({{ asset('build/assets/img/tasteofparis.a1e23f9d.jpg') }})">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <div class="site-heading">
                         <h1>C'est quoi qu'on mange aujourd'hui ?</h1>
-                        <span class="subheading">Les plats du jour autour de Netapsys ce <?php echo strtolower(menuDuJour::getDay());?></span>
+                        <span class="subheading">Les plats du jour autour de Netapsys ce {{ weekDay }}</span>
                     </div>
                 </div>
             </div>
@@ -51,153 +51,59 @@
         <div class="row">
             <div class="col-lg-8 col-md-10 mx-auto">
 
-                <div class="post-preview">
-                    <a href="https://www.google.fr/maps/dir/48.6144167,7.7087412/March%C3%A9+Frais+de+St%C3%A9phane+Biot,+51+Rue+de+Strasbourg,+67206+Mittelhausbergen/@48.6120922,7.7009841,17z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x4796b7e8b96b27a5:0x5629eff44b35cd22!2m2!1d7.6987196!2d48.6097677!3e3!5m1!1e1" target="_blank">
-                        <h2 class="post-title">
-                            <?php echo "Marché Biot : " . menuDuJour::marcheBiotPrice();?>
-                        </h2>
-                        <h3 class="post-subtitle">
-                            <?php echo menuDuJour::marcheBiot()[0];
-                if(menuDuJour::marcheBiotVege()[0]){
-                    echo "<p style='color:#00cc66'>Vege friendly : " . menuDuJour::marcheBiotVege() . "</p>" ;}?>
-                        </h3>
-                    </a>
-                    <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
-                        <?php
-              echo "ce " . strtolower(menuDuJour::getDay()) . " à 8h03";?>
-                        <a href="http://sbiot.fr/accueil/plats-jour-de-semaine/" target="_blank">
-                <span class="fa-stack fa-lg color:#1E90FF">
-                  <i class="fa fa-circle fa-stack-1x"></i>
-                  <i class="fa fa-link fa-stack-1x fa-inverse"></i>
-                </span>
-                        </a>
-                    </p>
-                </div>
-
+                {% for restaurant in restaurants %}
                 <hr>
 
                 <div class="post-preview">
-                    <a href="https://www.google.fr/maps/dir/48.6144167,7.7087412/Le+K,+2+Avenue+de+l'Europe,+67300+Schiltigheim/@48.6128001,7.709134,17z/data=!3m1!4b1!4m17!1m6!3m5!1s0x4796b7e35e6cb0bd:0xacbe350ad43d37cb!2sLe+K!8m2!3d48.6119471!4d7.7135983!4m9!1m1!4e1!1m5!1m1!1s0x4796b7e35e6cb0bd:0xacbe350ad43d37cb!2m2!1d7.7135983!2d48.6119471!3e3!5m1!1e1" target="_blank">
+                    <a href="{{ restaurant.url }}" target="_blank">
                         <h2 class="post-title">
-                            Au "K" : 13€
                         </h2>
                         <h3 class="post-subtitle">
-                            <?php echo menuDuJour::leK() ;?>
+                            {% if restaurant.name != "Papa Ciccio" %}
+
+                                {{ restaurant.name }} - {{ restaurant.price }}<br>
+                                {{ restaurant.todayspecial }}
+                                {% if restaurant.vegantodayspecial %}
+                                    <br>{{ restaurant.vegantodayspecial }}
+                                {% endif %}
+                            {#Except div for Papa Ciccio#}
+                            {% else %}
+                                <span>Les pâtes :</span><p>Farfale, Fusilli, Penne, Spaghetti</p><br/><br/>
+                                <span>Les sauces :</span>
+                                <p>3 fromages<br/>
+                                    Arrabiatta<br/>
+                                    Aurora<br/>
+                                    Bolognaise<br/>
+                                    Carbonara Thon / Boeuf / Lardons / Pesto Verde<br/>
+                                    Champignon crème<br/>
+                                    Olive (sauce tomate)<br/>
+                                    Pesto Verde / Rosso<br/>
+                                    Piccantina<br/>
+                                    Poulet Curry / Oignon / Poivre / Moutarde<br/>
+                                    Poulet Méditerranéene (don't ask) / Champignons noirs<br/>
+                                    Saumon crème</p><br/><br/>
+                                <span>Les fromages :</span><p> emmental, parmigiano</p><br/><br/>
+
+                                03 88 83 20 08
+                                </p>
+                            {% endif %}
+
                         </h3>
                     </a>
                     <p class="post-meta">Cuisiné par
                         <a href="#">Hungry bot</a>
-                        <?php echo "ce " . strtolower(menuDuJour::getDay()) . " à 8h02";?>
-                        <a href="https://www.restaurant-le-k.com/a-table/" target="_blank">
-                <span class="fa-stack fa-lg color:#1E90FF">
-                  <i class="fa fa-circle fa-stack-1x"></i>
-                  <i class="fa fa-link fa-stack-1x fa-inverse"></i>
-                </span>
+                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }}
+                        <a href="{{ restaurant.mappy }}" target="_blank">
+                    <span class="fa-stack fa-lg color:#1E90FF">
+                      <i class="fa fa-circle fa-stack-1x"></i>
+                      <i class="fa fa-link fa-stack-1x fa-inverse"></i>
+                    </span>
                         </a>
                     </p>
                 </div>
-
-                <hr>
-
-                <div class="post-preview">
-                    <a href="https://www.google.fr/maps/dir/48.6144167,7.7087412/La+Petite+Pause+Schiltigheim,+Rue+Alfred+Kastler,+Schiltigheim/@48.6124495,7.7124531,17z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x4796c81d207fde15:0x47ddda0880f8dd3!2m2!1d7.720553!2d48.610507!3e3!5m1!1e1" target="_blank">
-                        <h2 class="post-title">
-                            <?php echo "La Petite Pause : " . menuDuJour::laPetitePausePrice();?>
-                        </h2>
-                        <h3 class="post-subtitle">
-                            <?php echo menuDuJour::laPetitePause()[0] ;?>
-                        </h3>
-                    </a>
-                    <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
-                        <?php echo "ce " . strtolower(menuDuJour::getDay()) . " à 8h02";?>
-                        <a href="http://www.lapetitepause.fr/" target="_blank">
-                <span class="fa-stack fa-lg color:#1E90FF">
-                  <i class="fa fa-circle fa-stack-1x"></i>
-                  <i class="fa fa-link fa-stack-1x fa-inverse"></i>
-                </span>
-                        </a>
-                    </p>
-                </div>
-
-                <hr>
-
-                <div class="post-preview">
-                    <a href="https://www.leshirondelles.fr/" target="_blank">
-                        <h2 class="post-title">
-                            <?php echo "Les Hirondelles : 7,40€"?>
-                        </h2>
-                        <h3 class="post-subtitle">
-                            <?php echo menuDuJour::lesHirondelles()[0] ;?>
-                        </h3>
-                    </a>
-                    <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
-                        <?php echo "ce " . strtolower(menuDuJour::getDay()) . " à 8h01";?>
-                        <a href="https://www.leshirondelles.fr/" target="_blank">
-                <span class="fa-stack fa-lg color:#1E90FF">
-                  <i class="fa fa-circle fa-stack-1x"></i>
-                  <i class="fa fa-link fa-stack-1x fa-inverse"></i>
-                </span>
-                        </a>
-                    </p>
-                </div>
-
-                <hr>
-
-                <div class="post-preview">
-                    <a href="https://www.google.fr/maps/dir/48.6144167,7.7087412/Papa+Ciccio,+Route+du+G%C3%A9n%C3%A9ral+de+Gaulle,+Schiltigheim/@48.6095721,7.7147292,15z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x4796c814f00a4191:0x8c4b5b01a1ce1582!2m2!1d7.7378317!2d48.603201!3e3!5m1!1e1" target="_blank">
-                        <h2 class="post-title">
-                            Chez Papa Ciccio : 6,50€
-                        </h2>
-                        <h3 class="post-subtitle">
+                {% endfor %}
 
 
-                            Menu Ciccio
-                        </h3>
-                    </a>
-                    <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
-                        <?php echo "et ce tous les jours de la semaine";?>
-                        <a href="https://www.facebook.com/Papaciccio2007/"  target="_blank">
-                <span class="fa-stack fa-lg color:#1E90FF">
-                  <i class="fa fa-circle fa-stack-1x"></i>
-                  <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                </span>
-                        </a>
-                    </p>
-                </div>
-
-                <hr>
-
-                <div class="post-preview">
-                    <a href="https://www.google.fr/maps/dir/48.6144167,7.7087412/Air+Bagels,+2+Rue+de+Dublin,+67300+Schiltigheim/@48.6137486,7.7076986,17z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x4796b7fb3e83d977:0xa6c87baeb69c99a9!2m2!1d7.7100167!2d48.6130662!3e3!5m1!1e1" target="_blank">
-                        <h2 class="post-title">
-                            Air Bagels : 6,70€ à 10,50€
-                        </h2>
-                    </a>
-                    <a href="https://airbagels-schiltigheim.miam-express.com/" target="_blank">
-                        <h3 class="post-subtitle">
-                            Salade ou Bagel. <br/><br/>
-                            Plus de détails sur le site...
-                        </h3>
-                    </a>
-                    <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
-                        <?php echo "et ce tous les jours de la semaine";?>
-                        <a href="https://airbagels-schiltigheim.miam-express.com/" target="_blank">
-                <span class="fa-stack fa-lg color:#1E90FF">
-                  <i class="fa fa-circle fa-stack-1x"></i>
-                  <i class="fa fa-link fa-stack-1x fa-inverse"></i>
-                </span>
-                        </a>
-                    </p>
-                </div>
-                <!-- Pager -->
-                <!-- <div class="clearfix">
-                  <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
-                </div> -->
             </div>
         </div>
     </div>

@@ -26,7 +26,7 @@ class RestaurantRepository extends ServiceEntityRepository
         3 => "Mercredi",
         4 => "Jeudi",
         5 => "Vendredi",
-        6 => "Plats" //Exception pour la fin de semaine chez La Petite Pause
+        6 => "Plats" //Exception pour la fin de semaine à La Petite Pause
     ];
 
     public function __construct(RegistryInterface $registry)
@@ -99,6 +99,8 @@ class RestaurantRepository extends ServiceEntityRepository
     /* return STR */
     private function getUrlInfo($url){
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15); //timeout in seconds
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -116,12 +118,22 @@ class RestaurantRepository extends ServiceEntityRepository
 
         $pregMatch = "/(?<=" . self::getDayMinusOneDay() . "<\/div><\/div><\/li><li class='odd'><div><p class='item-text'>)(.*?)(<\/p>)/";
 
+        $menu = [];
+
         if($dw == "Lundi"){
             preg_match_all("/(?<=<li class='odd'><div><p class='item-text'>)(.*?)(<\/p><p class='desc'>)/", $curlResult, $menu);
-            return(array($menu[1][0], $curlResult));
+            if(!empty($menu)){
+                return(array($menu[1][0], $curlResult));
+            } else {
+                return(array($menu[1]["Une erreur est survenue lors du traitement"], $curlResult));
+            }
         } else {
             preg_match_all($pregMatch, $curlResult, $menu);
-            return(array($menu[0][0], $curlResult));
+            if(!empty($menu)){
+                return(array($menu[1][0], $curlResult));
+            } else {
+                return(array($menu[0]["Une erreur est survenue lors du traitement"], $curlResult));
+            }
         }
     }
 
@@ -154,7 +166,12 @@ class RestaurantRepository extends ServiceEntityRepository
         preg_match_all($firstPregMatch, $curlResult, $menu);
 
         $secondPregMatch = "/(?<=<p>)(.*)(?=)/";
+//        var_export($menu[0]);
         preg_match_all($secondPregMatch, $menu[0][0], $menu);
+
+        preg_replace("<br/>","\n", $menu[0][0]);
+        preg_replace("<br>","\n", $menu[0][0]);
+
 
         return(array($menu[0][0], $curlResult));
     }
@@ -200,6 +217,8 @@ class RestaurantRepository extends ServiceEntityRepository
         $thisDay = self::getDayOfTheWeek($dw);
         $end = self::getDayOfTheWeek($dw+1);
 
+        $tabMenu = [];
+
         preg_match_all("/([A-Za-zàéèêœùïî\-\,]+)/", $curlResult, $menu);
 
         //reformatage du tableau $menu
@@ -239,8 +258,14 @@ class RestaurantRepository extends ServiceEntityRepository
     public function laPetitePausePrice(){
         $curlResult = self::laPetitePause()[1];
         $dw = self::getDay();
+        $menu = [];
+        var_dump($menu);
 
         preg_match_all("/(?<=<h2>Notre Chef vous propose ses Plats du Jour à )(.*?)(?=<\/h2>)/", $curlResult, $menu);
             return($menu[0][0]);
+    }
+
+    public function laCaveProfonde(){
+
     }
 }

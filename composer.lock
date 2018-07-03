@@ -1803,7 +1803,7 @@
         },
         {
             "name": "symfony/asset",
-            "version": "v4.1.0",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/asset.git",
@@ -2524,16 +2524,16 @@
         },
         {
             "name": "symfony/form",
-            "version": "v4.1.0",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/form.git",
-                "reference": "95f8237303e1f7101fee0e72d6ba630a3e4c5178"
+                "reference": "cf9ed8b1a17b34d52c458352cb0c29838ee5f825"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/form/zipball/95f8237303e1f7101fee0e72d6ba630a3e4c5178",
-                "reference": "95f8237303e1f7101fee0e72d6ba630a3e4c5178",
+                "url": "https://api.github.com/repos/symfony/form/zipball/cf9ed8b1a17b34d52c458352cb0c29838ee5f825",
+                "reference": "cf9ed8b1a17b34d52c458352cb0c29838ee5f825",
                 "shasum": ""
             },
             "require": {
@@ -2601,7 +2601,7 @@
             ],
             "description": "Symfony Form Component",
             "homepage": "https://symfony.com",
-            "time": "2018-05-30T07:26:09+00:00"
+            "time": "2018-06-22T08:59:39+00:00"
         },
         {
             "name": "symfony/framework-bundle",
