@@ -55,7 +55,8 @@ class TodaysSpecialController extends Controller
             $secondDate = new \DateTime;
             $secondDate = $secondDate->format('Y-m-d');
 
-            if ((!($firstDate == $secondDate)) || @$_POST['refresh']) {
+            dump(@$_POST['refresh']);
+            if ((!($firstDate == $secondDate)) || @$_POST['refresh'] == "refreshed") {
                 switch ($restaurantFromTab){
                     case 'Le K' :
                         $restaurant->setLastUpdate(New \DateTime());

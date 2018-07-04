@@ -87,7 +87,6 @@ class RestaurantRepository extends ServiceEntityRepository
         if(self::getDay() != "Lundi"){
             $timestamp = time();
             $dw = date(strtotime('-1 day'), strtotime($timestamp));
-            var_dump($dw);
             $dw = date("w", $dw);
             $dw = self::DAYWEEK[$dw];
             return $dw;
@@ -145,7 +144,10 @@ class RestaurantRepository extends ServiceEntityRepository
         $trim = ":" . $dw . "</div></div></li><li class='even'><div><p class='item-text'>";
 
         preg_match_all($pregMatch,$curlResult, $menu);
-        return(trim($menu[0][0], $trim));
+
+        $cleanMenu = $menu[0][0];
+
+        return(trim($cleanMenu, $trim));
     }
 
     public function marcheBiotPrice(){
@@ -155,7 +157,10 @@ class RestaurantRepository extends ServiceEntityRepository
         preg_match_all(
         "/(?<=div class='value-col value-1'>)(.*?)(?=<\/div><div class='value-col value-2'>)/",
         $curlResult, $menu);
-            return($menu[0][0]);
+
+        $cleanMenu = $menu[0][0];
+
+            return($cleanMenu);
     }
 
     public function lesHirondelles(){
@@ -169,11 +174,14 @@ class RestaurantRepository extends ServiceEntityRepository
 //        var_export($menu[0]);
         preg_match_all($secondPregMatch, $menu[0][0], $menu);
 
-        preg_replace("<br/>","\n", $menu[0][0]);
-        preg_replace("<br>","\n", $menu[0][0]);
+        $cleanMenu = $menu[0][0];
 
+        $cleaningMenu = ["<br />", "<br/>", "<br>", "<br...",];
+        foreach ($cleaningMenu as $cleanse){
+            $cleanMenu = str_replace($cleanse,"", $cleanMenu);
+        }
 
-        return(array($menu[0][0], $curlResult));
+        return(array($cleanMenu, $curlResult));
     }
 
     public function leK(){
@@ -204,8 +212,17 @@ class RestaurantRepository extends ServiceEntityRepository
             }
         }
         $totalElemInArray = count($newArray);
+
         unset($newArray[$totalElemInArray-1]);
-        return implode($newArray, " ");
+
+        $cleanMenu = implode($newArray, " ");
+
+        $cleaningMenu = ["//"];
+        foreach ($cleaningMenu as $cleanse){
+            $cleanMenu = str_replace($cleanse,"", $cleanMenu);
+        }
+
+        return $cleanMenu;
 
     }
 
@@ -259,10 +276,11 @@ class RestaurantRepository extends ServiceEntityRepository
         $curlResult = self::laPetitePause()[1];
         $dw = self::getDay();
         $menu = [];
-        var_dump($menu);
 
         preg_match_all("/(?<=<h2>Notre Chef vous propose ses Plats du Jour à )(.*?)(?=<\/h2>)/", $curlResult, $menu);
-            return($menu[0][0]);
+
+        $cleanMenu = $menu[0][0];
+        return($cleanMenu);
     }
 
     public function laCaveProfonde(){
