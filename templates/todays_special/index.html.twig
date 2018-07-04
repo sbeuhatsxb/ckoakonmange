@@ -23,16 +23,20 @@
                             <button value="refresh" class="btn btn-default" type="submit">Refresh</button>
                         </form>
                     </li>
-                    <!-- <li class="nav-item">
-                      <a class="nav-link" href="contact.html">Contact</a>
-                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link"> dernière mise à jour : {{ lastGlobalUpdate }}</a>
+                    </li>
+
+                    {#<li class="nav-item">#}
+                      {#<a class="nav-link" href="contact.html">Contact</a>#}
+                    {#</li>#}
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- Page Header -->
-    <header class="masthead" style="background-image: url({{ asset('build/assets/img/tasteofparis.a1e23f9d.jpg') }})">
+    <header class="masthead" style="background-image: url({{ asset('build/assets/img/tasteofparis.jpg') }})">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
@@ -59,13 +63,20 @@
                         <h2 class="post-title">
                         </h2>
                         <h3 class="post-subtitle">
-                            {% if restaurant.name != "Papa Ciccio" %}
+                        {% if restaurant.name != "Papa Ciccio" %}
 
-                                {{ restaurant.name }} - {{ restaurant.price }}<br>
-                                {{ restaurant.todayspecial }}
-                                {% if restaurant.vegantodayspecial %}
+
+                        <h2 class="post-title">
+                            {{ restaurant.name }} - {{ restaurant.price }}
+                        </h2>
+                        <h3 class="post-subtitle">{{ restaurant.todayspecial }}
+                            {% if restaurant.vegantodayspecial %}
+                                {% set stringLength = restaurant.vegantodayspecial | length %}
+                                {% if stringLength >= 4 %}
                                     <br>{{ restaurant.vegantodayspecial }}
                                 {% endif %}
+
+                            {% endif %}
                             {#Except div for Papa Ciccio#}
                             {% else %}
                                 <span>Les pâtes :</span><p>Farfale, Fusilli, Penne, Spaghetti</p><br/><br/>
@@ -87,8 +98,9 @@
                                 03 88 83 20 08
                                 </p>
                             {% endif %}
-
                         </h3>
+
+
                     </a>
                     <p class="post-meta">Cuisiné par
                         <a href="#">Hungry bot</a>

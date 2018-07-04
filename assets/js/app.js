@@ -1,8 +1,8 @@
 // assets/js/app.js
 require('../css/app.min.css');
-require('../css/bootstrap.min.css');
-// require('../img/tasteofparis.jpg');
-require('../css/fontawesome/css/font-awesome.min.css');
+require('../css/bootstrap/css/bootstrap.min.css');
+require('../css/bootstrap/js/bootstrap.bundle.js');
+require('../css/fontawesome/css/font-awesome.css');
 // loads the jquery package from node_modules
 const $ = require('jquery');
 

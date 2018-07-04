@@ -32,7 +32,8 @@ Encore
 // .enableSassLoader()
 
     .configureFilenames({
-        images: '[path][name].[hash:8].[ext]',
+        images: '[path][name].[ext]',
+        // images: '[path][name].[hash:8].[ext]',
 })
 ;
 

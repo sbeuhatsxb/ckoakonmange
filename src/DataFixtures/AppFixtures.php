@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Restaurant;
+use App\Entity\LastUpdate;
 use App\Repository\RestaurantRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -14,6 +15,10 @@ class AppFixtures extends Fixture
         $date = new \DateTime();
         $date->setTimestamp(1171502725); ///antoher day
         // create 20 products! Bam!
+        $lastGlobalRefresh = new LastUpdate();
+        $lastGlobalRefresh->setLastGlobalRefresh($date);
+        $manager->persist($lastGlobalRefresh);
+
         $restaurant = new Restaurant();
         $restaurant->setName('Marché Biot');
         $restaurant->setTodaySpecial(RestaurantRepository::marcheBiot()[0]);

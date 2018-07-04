@@ -6,6 +6,7 @@ use App\Repository\RestaurantUpdateRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Repository\RestaurantRepository;
 use App\Entity\Restaurant;
+use App\Entity\LastUpdate;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 
@@ -28,10 +29,22 @@ class TodaysSpecialController extends Controller
         ;
         $weekday = strtolower(RestaurantRepository::getDay());
 
+        $lastGlobalUpdate = $this->getDoctrine()
+            ->getRepository(LastUpdate::class)
+            ->findAll();
+        ;
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $lastGlobalUpdate = $entityManager->getRepository(LastUpdate::class)->findAll();
+        $lastGlobalUpdate = $lastGlobalUpdate[0]->getLastGlobalRefresh()->format('H:i');
+
+        dump($lastGlobalUpdate);
+
         return $this->render('todays_special/index.html.twig', [
             'controller_name' => 'TodaysSpecialController',
             'restaurants' => $restaurants,
             'weekDay' => $weekday,
+            'lastGlobalUpdate' => $lastGlobalUpdate,
         ]);
     }
 
@@ -51,12 +64,15 @@ class TodaysSpecialController extends Controller
                 );
             }
 
-            $firstDate = $restaurant->getLastUpdate()->format('Y-m-d');
+            $lastGlobalUpdate = $entityManager->getRepository(LastUpdate::class)->findAll();
+            $firstDate = $lastGlobalUpdate[0]->getLastGlobalRefresh()->format('Y-m-d');
             $secondDate = new \DateTime;
             $secondDate = $secondDate->format('Y-m-d');
 
-            dump(@$_POST['refresh']);
-            if ((!($firstDate == $secondDate)) || @$_POST['refresh'] == "refreshed") {
+            if ((!($firstDate  == $secondDate)) || @$_POST['refresh'] == "refreshed") {
+
+                $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
+
                 switch ($restaurantFromTab){
                     case 'Le K' :
                         $restaurant->setLastUpdate(New \DateTime());
