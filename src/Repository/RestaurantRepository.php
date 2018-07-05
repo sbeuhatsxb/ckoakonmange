@@ -3,8 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Restaurant;
+use App\Entity\LastUpdate;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Service\CurlRestaurantsService;
+use App\Repository\RestaurantUpdateRepository;
+use Doctrine\ORM\EntityRepository;
 
 
 
@@ -17,22 +21,11 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class RestaurantRepository extends ServiceEntityRepository
 {
 
-    /* INT */
-    public $dw;
-
-    CONST DAYWEEK = [
-        1 => "Lundi",
-        2 => "Mardi",
-        3 => "Mercredi",
-        4 => "Jeudi",
-        5 => "Vendredi",
-        6 => "Plats" //Exception pour la fin de semaine à La Petite Pause
-    ];
-
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Restaurant::class);
     }
+
 
 //    /**
 //     * @return Restaurant[] Returns an array of Restaurant objects
@@ -63,227 +56,192 @@ class RestaurantRepository extends ServiceEntityRepository
     }
     */
 
-    public function getDayOfTheWeek($dw){
-        return self::DAYWEEK[$dw];
+    /**
+     * @param $price
+     * @return Product[]
+     */
+    public function findOneRestaurantByName($restaurantFromTab): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->where('name' == $restaurantFromTab)
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+        return $qb->execute();
     }
 
-    /* return INT */
-    private function getIntDay(){
-        $timestamp = time();
-        $dw = date( "w", $timestamp);
-        return $dw;
+    public function findLastGlobalUpdate(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+        return $qb->execute();
     }
 
-    /* return STR */
-    public function getDay(){
-        $timestamp = time();
-        $dw = date("w", $timestamp);
-        $dw = self::DAYWEEK[$dw];
-        return $dw;
-    }
+    public function updateAllRestaurants()
+    {
+        $restaurantTab = ['Le K','Les Hirondelles','La Petite Pause','Le K', "Air Bagel", "Papa Ciccio"];
 
-    /* return STR */
-    public function getDayMinusOneDay(){
-        if(self::getDay() != "Lundi"){
-            $timestamp = time();
-            $dw = date(strtotime('-1 day'), strtotime($timestamp));
-            $dw = date("w", $dw);
-            $dw = self::DAYWEEK[$dw];
-            return $dw;
-        } else {
-            return "";
-        }
-    }
+        foreach($restaurantTab as $restaurantFromTab) {
 
-    /* return STR */
-    private function getUrlInfo($url){
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15); //timeout in seconds
-        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Hi ! We\'re some guys around here...');
-        $curlResult = curl_exec($ch);
-        curl_close($ch);
-        return $curlResult;
-    }
+            unset($restaurant);
+
+            $restaurant = RestaurantRepository::findOneRestaurantByName($restaurantFromTab);
+
+            if (!$restaurant) {
+                throw $this->createNotFoundException(
+                    'No product found for' . $restaurantFromTab
+                );
+            }
+
+            $lastGlobalUpdate = $this->findLastGlobalUpdate();
+            $firstDate = $lastGlobalUpdate[0]->getLastGlobalRefresh()->format('Y-m-d');
+            $secondDate = new \DateTime;
+            $secondDate = $secondDate->format('Y-m-d');
+
+            if ((!($firstDate  == $secondDate)) || @$_POST['refresh'] == "refreshed") {
+
+                $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
+
+                switch ($restaurantFromTab){
+                    case 'Le K' :
+                        $restaurant->setLastUpdate(New \DateTime());
+                        $restaurant->setTodaySpecial(RestaurantRepository::leK());
+                        $entityManager->flush();
+                        break;
+                    case 'Les Hirondelles':
+                        $restaurant->setLastUpdate(New \DateTime());
+                        $restaurant->setTodaySpecial(RestaurantRepository::lesHirondelles()[0]);
+                        $entityManager->flush();
+                        break;
+                    case 'La Petite Pause':
+                        $restaurant->setLastUpdate(New \DateTime());
+                        $restaurant->setTodaySpecial(RestaurantRepository::laPetitePause()[0]);
+                        $restaurant->setPrice(RestaurantRepository::laPetitePausePrice());
+                        $entityManager->flush();
+                        break;
+                    case 'Marché Biot':
+                        $restaurant->setLastUpdate(New \DateTime());
+                        $restaurant->setTodaySpecial(RestaurantRepository::marcheBiot()[0]);
+                        $restaurant->setVeganTodaySpecial(RestaurantRepository::marcheBiotVege()[0]);
+                        $restaurant->setPrice(RestaurantRepository::marcheBiotPrice());
+                        $entityManager->flush();
+                        break;
+                    case 'Air Bagel' :
+                        $restaurant->setLastUpdate(New \DateTime());
+                        $entityManager->flush();
+                        break;
+                    case 'Papa Ciccio' :
+                        $restaurant->setLastUpdate(New \DateTime());
+                        $entityManager->flush();
+                        break;
+                }
 
 
-    public function marcheBiot(){
-        $url = 'http://sbiot.fr/accueil/plats-jour-de-semaine/';
-        $curlResult = self::getUrlInfo($url);
-        $dw = self::getDay();
-
-        $pregMatch = "/(?<=" . self::getDayMinusOneDay() . "<\/div><\/div><\/li><li class='odd'><div><p class='item-text'>)(.*?)(<\/p>)/";
-
-        $menu = [];
-
-        if($dw == "Lundi"){
-            preg_match_all("/(?<=<li class='odd'><div><p class='item-text'>)(.*?)(<\/p><p class='desc'>)/", $curlResult, $menu);
-            if(!empty($menu)){
-                return(array($menu[1][0], $curlResult));
             } else {
-                return(array($menu[1]["Une erreur est survenue lors du traitement"], $curlResult));
+                return null;
             }
+        }
+    }
+
+    public function updateMb()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $restaurant = $entityManager->getRepository(Restaurant::class)->findOneBy(['name' => 'Marché Biot']);;
+
+        if (!$restaurant) {
+            throw $this->createNotFoundException(
+                'No product found for "Marché Biot" '
+            );
+        }
+
+        $firstDate = $restaurant->getLastUpdate()->format('Y-m-d');
+        $secondDate = new \DateTime;
+        $secondDate = $secondDate->format('Y-m-d');
+
+        if (!($firstDate == $secondDate)){
+            $restaurant->setLastUpdate(new \DateTime());
+            $restaurant->setTodaySpecial(CurlRestaurantsService::marcheBiot()[0]);
+            $restaurant->setVeganTodaySpecial(CurlRestaurantsService::marcheBiotVege()[0]);
+            $restaurant->setPrice(CurlRestaurantsService::marcheBiotPrice());
+            $entityManager->flush();
         } else {
-            preg_match_all($pregMatch, $curlResult, $menu);
-            if(!empty($menu)){
-                return(array($menu[1][0], $curlResult));
-            } else {
-                return(array($menu[0]["Une erreur est survenue lors du traitement"], $curlResult));
-            }
-        }
-    }
-
-    public function marcheBiotVege(){
-        $curlResult = self::marcheBiot()[1];
-        $dw = self::getDay();
-
-        $pregMatch = "/(?=". $dw ."<\/div><\/div><\/li><li class='even'><div><p class='item-text'>).+?(?=<\/p><p class='desc'><img src=)/";
-        $trim = ":" . $dw . "</div></div></li><li class='even'><div><p class='item-text'>";
-
-        preg_match_all($pregMatch,$curlResult, $menu);
-
-        $cleanMenu = $menu[0][0];
-
-        return(trim($cleanMenu, $trim));
-    }
-
-    public function marcheBiotPrice(){
-        $curlResult = self::marcheBiot()[1];
-        $dw = self::getDay();
-
-        preg_match_all(
-        "/(?<=div class='value-col value-1'>)(.*?)(?=<\/div><div class='value-col value-2'>)/",
-        $curlResult, $menu);
-
-        $cleanMenu = $menu[0][0];
-
-            return($cleanMenu);
-    }
-
-    public function lesHirondelles(){
-        $url = 'https://www.leshirondelles.fr/';
-        $curlResult = self::getUrlInfo($url);
-
-        $firstPregMatch = '/(?<=<h2>Le Menu du jour<\/h2>)([^)]+)(?=a href="https:\/\/www.leshirondelles.fr)/';
-        preg_match_all($firstPregMatch, $curlResult, $menu);
-
-        $secondPregMatch = "/(?<=<p>)(.*)(?=)/";
-//        var_export($menu[0]);
-        preg_match_all($secondPregMatch, $menu[0][0], $menu);
-
-        $cleanMenu = $menu[0][0];
-
-        $cleaningMenu = ["<br />", "<br/>", "<br>", "<br...",];
-        foreach ($cleaningMenu as $cleanse){
-            $cleanMenu = str_replace($cleanse,"", $cleanMenu);
+            return null;
         }
 
-        return(array($cleanMenu, $curlResult));
     }
 
-    public function leK(){
-        $url = 'https://www.restaurant-le-k.com/a-table/';
-        $curlResult = self::getUrlInfo($url);
-        $dw = self::getIntDay();
-        $thisDay = self::getDayOfTheWeek($dw);
-        $end = self::getDayOfTheWeek($dw+1);
+    public function updateLeK()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $restaurant = $entityManager->getRepository(Restaurant::class)->findOneBy(['name' => 'Le K']);;
 
-        preg_match_all("/(?<=<meta name=\"twitter:description\" content=\")(.*?)(?=\/>)/", $curlResult, $menu);
-        $weekMenuArray = explode(" ", $menu[0][0]);
-
-        /* On parse le résultat du pregmatch avec comme critère le jour de la semaine afin de récupérer le nom du plat indiqué
-        entre les deux jours*/
-        $newArray = [];
-        $i = 0;
-        $start = false;
-        foreach ($weekMenuArray as $element) {
-            if($start){
-                $newArray[$i] = $element;
-                $i++;
-            }
-            if($element == $thisDay){
-                $start = true;
-            }
-            if($element == $end){
-                $start = false;
-            }
-        }
-        $totalElemInArray = count($newArray);
-
-        unset($newArray[$totalElemInArray-1]);
-
-        $cleanMenu = implode($newArray, " ");
-
-        $cleaningMenu = ["//"];
-        foreach ($cleaningMenu as $cleanse){
-            $cleanMenu = str_replace($cleanse,"", $cleanMenu);
+        if (!$restaurant) {
+            throw $this->createNotFoundException(
+                'No product found for "Le K" '
+            );
         }
 
-        return $cleanMenu;
+        $firstDate = $restaurant->getLastUpdate()->format('Y-m-d');
+        $secondDate = new \DateTime;
+        $secondDate = $secondDate->format('Y-m-d');
+        if (!($firstDate == $secondDate)){
+            $restaurant->setLastUpdate(new \DateTime());
+            $restaurant->setTodaySpecial(CurlRestaurantsService::leK()[0]);
+            $entityManager->flush();
+        } else {
+            return null;
+        }
 
     }
 
-    public function laPetitePause(){
+    public function updateLPP()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $restaurant = $entityManager->getRepository(Restaurant::class)->findOneBy(['name' => 'La Petite Pause']);;
 
-        $url = 'http://www.lapetitepause.fr/';
-        $curlResult = self::getUrlInfo($url);
-        $dw = self::getIntDay();
-        $thisDay = self::getDayOfTheWeek($dw);
-        $end = self::getDayOfTheWeek($dw+1);
-
-        $tabMenu = [];
-
-        preg_match_all("/([A-Za-zàéèêœùïî\-\,]+)/", $curlResult, $menu);
-
-        //reformatage du tableau $menu
-        $j =0;
-        foreach($menu[$j] as $key=>$value){
-            $tabMenu[] = $value;
-            $j++;
+        if (!$restaurant) {
+            throw $this->createNotFoundException(
+                'No product found for "La Petite Pause" '
+            );
         }
 
-        /*liste d'exclusion après le pregmatch*/
-        $badWords = ["li", "ul", "span", "lpp-made-by", "class", "href", "main-nav",
-            "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "aout", "septembre", "octobre", "décembre"];
-
-        /* On parse le résultat du pregmatch avec comme critère le jour de la semaine afin de récupérer le nom du plat indiqué
-        entre les deux jours*/
-        $newArray = [];
-        $i = 0;
-        $start = false;
-        foreach ($tabMenu as $element) {
-            if($start == true && !in_array($element, $badWords)){
-                $newArray[$i] = $element;
-                $i++;
-            }
-            if($element == $thisDay || $element == strtolower($thisDay)){
-                    $start = true;
-            }
-            if($element == $end || $element == strtolower($end)){
-                $start = false;
-            }
+        $firstDate = $restaurant->getLastUpdate()->format('Y-m-d');
+        $secondDate = new \DateTime;
+        $secondDate = $secondDate->format('Y-m-d');
+        if (!($firstDate == $secondDate)){
+            $restaurant->setLastUpdate(new \DateTime());
+            $restaurant->setTodaySpecial(CurlRestaurantsService::laPetitePause()[0]);
+            $restaurant->setPrice(CurlRestaurantsService::laPetitePausePrice());
+            $entityManager->flush();
+        } else {
+            return null;
         }
-        $totalElemInArray = count($newArray);
-        unset($newArray[$totalElemInArray-1]);
-        return array(implode($newArray, " "), $curlResult);
 
     }
 
-    public function laPetitePausePrice(){
-        $curlResult = self::laPetitePause()[1];
-        $dw = self::getDay();
-        $menu = [];
+    public function updateLH()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $restaurant = $entityManager->getRepository(Restaurant::class)->findOneBy(['name' => 'Les Hirondelles']);;
 
-        preg_match_all("/(?<=<h2>Notre Chef vous propose ses Plats du Jour à )(.*?)(?=<\/h2>)/", $curlResult, $menu);
+        if (!$restaurant) {
+            throw $this->createNotFoundException(
+                'No product found for "Les Hirondelles" '
+            );
+        }
 
-        $cleanMenu = $menu[0][0];
-        return($cleanMenu);
-    }
-
-    public function laCaveProfonde(){
+        $firstDate = $restaurant->getLastUpdate()->format('Y-m-d');
+        $secondDate = new \DateTime;
+        $secondDate = $secondDate->format('Y-m-d');
+        if (!($firstDate == $secondDate)){
+            $restaurant->setLastUpdate(new \DateTime());
+            $restaurant->setTodaySpecial(CurlRestaurantsService::lesHirondelles()[0]);
+            $entityManager->flush();
+        } else {
+            return null;
+        }
 
     }
 }
