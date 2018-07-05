@@ -84,14 +84,14 @@ class CurlRestaurantsService
         if($dw == "Lundi"){
             preg_match_all("/(?<=<li class='odd'><div><p class='item-text'>)(.*?)(<\/p><p class='desc'>)/", $curlResult, $menu);
             if(!empty($menu)){
-                return(array($menu[1][0], $curlResult));
+                return(array(iconv("UTF-8", "UTF-8//IGNORE",$menu[1][0]), $curlResult));
             } else {
                 return(array($menu[1]["Une erreur est survenue lors du traitement"], $curlResult));
             }
         } else {
             preg_match_all($pregMatch, $curlResult, $menu);
             if(!empty($menu)){
-                return(array($menu[1][0], $curlResult));
+                return(array(iconv("UTF-8", "UTF-8//IGNORE",$menu[1][0]), $curlResult));
             } else {
                 return(array($menu[0]["Une erreur est survenue lors du traitement"], $curlResult));
             }
@@ -107,7 +107,7 @@ class CurlRestaurantsService
 
         preg_match_all($pregMatch,$curlResult, $menu);
 
-        $cleanMenu = $menu[0][0];
+        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE",$menu[0][0]);
 
         return(trim($cleanMenu, $trim));
     }
@@ -120,7 +120,7 @@ class CurlRestaurantsService
             "/(?<=div class='value-col value-1'>)(.*?)(?=<\/div><div class='value-col value-2'>)/",
             $curlResult, $menu);
 
-        $cleanMenu = $menu[0][0];
+        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE",$menu[0][0]);
 
         return($cleanMenu);
     }
@@ -138,12 +138,12 @@ class CurlRestaurantsService
 
         $cleanMenu = $menu[0][0];
 
-        $cleaningMenu = ["<br />", "<br/>", "<br>", "<br...",];
+        $cleaningMenu = ["<br />", "<br/>", "<br>", "<br...", "</p>"];
         foreach ($cleaningMenu as $cleanse){
             $cleanMenu = str_replace($cleanse,"", $cleanMenu);
         }
 
-        return(array($cleanMenu, $curlResult));
+        return(array(iconv("UTF-8", "UTF-8//IGNORE",$cleanMenu), $curlResult));
     }
 
     public function leK(){
@@ -181,10 +181,10 @@ class CurlRestaurantsService
 
         $cleaningMenu = ["//"];
         foreach ($cleaningMenu as $cleanse){
-            $cleanMenu = str_replace($cleanse,"", $cleanMenu);
+            $cleanMenu = mb_ereg_replace($cleanse,"", $cleanMenu);
         }
 
-        return $cleanMenu;
+        return iconv("UTF-8", "UTF-8//IGNORE",$cleanMenu);
 
     }
 
@@ -230,7 +230,7 @@ class CurlRestaurantsService
         }
         $totalElemInArray = count($newArray);
         unset($newArray[$totalElemInArray-1]);
-        return array(implode($newArray, " "), $curlResult);
+        return array(iconv("UTF-8", "UTF-8//IGNORE",implode($newArray, " ")), $curlResult);
 
     }
 
@@ -241,7 +241,7 @@ class CurlRestaurantsService
 
         preg_match_all("/(?<=<h2>Notre Chef vous propose ses Plats du Jour à )(.*?)(?=<\/h2>)/", $curlResult, $menu);
 
-        $cleanMenu = $menu[0][0];
+        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE",$menu[0][0]);
         return($cleanMenu);
     }
 
