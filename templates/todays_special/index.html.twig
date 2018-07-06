@@ -56,24 +56,21 @@
             <div class="col-lg-8 col-md-10 mx-auto">
 
                 {% for restaurant in restaurants %}
-                <hr>
 
                 <div class="post-preview">
                     <a href="{{ restaurant.url }}" target="_blank">
-                        <h2 class="post-title">
-                        </h2>
                         <h3 class="post-subtitle">
                         {% if restaurant.name != "Papa Ciccio" %}
 
 
-                        <h2 class="post-title">
-                            {{ restaurant.name }} - {{ restaurant.price }}
-                        </h2>
-                        <h3 class="post-subtitle">{{ restaurant.todayspecial }}
+                        <h3 class="post-title">
+                            {{ restaurant.name }}
+                        </h3>
+                        <h4 class="post-subtitle">{{ restaurant.todayspecial }}
                             {% if restaurant.vegantodayspecial %}
                                 {% set stringLength = restaurant.vegantodayspecial | length %}
                                 {% if stringLength >= 4 %}
-                                    <br>{{ restaurant.vegantodayspecial }}
+                                    <br><p style="color: #339933;">Vege friendly : {{ restaurant.vegantodayspecial }}</p>
                                 {% endif %}
 
                             {% endif %}
@@ -98,30 +95,31 @@
                                 03 88 83 20 08
                                 </p>
                             {% endif %}
+                            </h4>
+                            <h5>{{ restaurant.price }}</h5>
                         </h3>
 
 
                     </a>
                     <p class="post-meta">Cuisiné par
                         <a href="#">Hungry bot</a>
-                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }}
-                        <a href="{{ restaurant.mappy }}" target="_blank">
+                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }} -
+                        <a href="{{ restaurant.mappy }}" target="_blank" class="color:#1E90FF">
+                            Voir la carte
                     <span class="fa-stack fa-lg color:#1E90FF">
-                      <i class="fa fa-circle fa-stack-1x"></i>
-                      <i class="fa fa-link fa-stack-1x fa-inverse"></i>
+                      <i class="fa fa fa-map-marker fa-stack-1x" aria-hidden="true"></i>
                     </span>
                         </a>
                     </p>
                 </div>
+                <hr>
                 {% endfor %}
 
 
             </div>
         </div>
     </div>
-
-    <!-- <hr> -->
-
+    
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -131,15 +129,14 @@
 
                         <li class="list-inline-item">
                             <a href="#">
-                  <span class="fa-stack fa-lg">
-                    <i class="fa fa-cog fa-spin fa-2x fa-fw"></i>
-                    <i class="sr-only"></i>
-                  </span>
+                              <span class="fa-stack fa-lg" style="color: #0085A1;">
+                                <i class="fa fa-cutlery fa-4x fa-fw"></i>
+                                <i class="sr-only"></i>
+                              </span>
                             </a>
                         </li>
 
                     </ul>
-                    <p class="copyright text-muted">Copyright &copy; Netapsys / Sodifrance / Antéo / On ne sait plus...</p>
                 </div>
             </div>
         </div>

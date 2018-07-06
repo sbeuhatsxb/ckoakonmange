@@ -72,7 +72,7 @@ class CurlRestaurantsService
     }
 
 
-    public function GetCurlMenuMarcheBiot(){
+    public function getCurlMenuMarcheBiot(){
         $url = 'http://sbiot.fr/accueil/plats-jour-de-semaine/';
         $curlResult = self::getUrlInfo($url);
         $dw = self::getDay();
@@ -98,22 +98,25 @@ class CurlRestaurantsService
         }
     }
 
-    public function GetCurlMenuMarcheBiotVege(){
-        $curlResult = self::GetCurlMenuMarcheBiot()[1];
+    public function getCurlMenuMarcheBiotVege(){
+        $curlResult = self::getCurlMenuMarcheBiot()[1];
         $dw = self::getDay();
+        // Debug
+//         $dw = "Jeudi";
 
         $pregMatch = "/(?=". $dw ."<\/div><\/div><\/li><li class='even'><div><p class='item-text'>).+?(?=<\/p><p class='desc'><img src=)/";
         $trim = ":" . $dw . "</div></div></li><li class='even'><div><p class='item-text'>";
 
         preg_match_all($pregMatch,$curlResult, $menu);
-
-        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE",$menu[0][0]);
+        if($menu != null) {
+            $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", (@$menu[0][0]));
+        }
 
         return(trim($cleanMenu, $trim));
     }
 
-    public function marcheBiotPrice(){
-        $curlResult = self::GetCurlMenuMarcheBiot()[1];
+    public function getCurlMarcheBiotPrice(){
+        $curlResult = self::getCurlMenuMarcheBiot()[1];
         $dw = self::getDay();
 
         preg_match_all(
@@ -125,7 +128,7 @@ class CurlRestaurantsService
         return($cleanMenu);
     }
 
-    public function GetCurlMenuLesHirondelles(){
+    public function getCurlMenuLesHirondelles(){
         $url = 'https://www.leshirondelles.fr/';
         $curlResult = self::getUrlInfo($url);
 
@@ -146,7 +149,7 @@ class CurlRestaurantsService
         return(array(iconv("UTF-8", "UTF-8//IGNORE",$cleanMenu), $curlResult));
     }
 
-    public function GetCurlMenuLeK(){
+    public function getCurlMenuLeK(){
         $url = 'https://www.restaurant-le-k.com/a-table/';
         $curlResult = self::getUrlInfo($url);
         $dw = self::getIntDay();
@@ -188,7 +191,7 @@ class CurlRestaurantsService
 
     }
 
-    public function GetCurlMenuLaPetitePause(){
+    public function getCurlMenuLaPetitePause(){
 
         $url = 'http://www.lapetitepause.fr/';
         $curlResult = self::getUrlInfo($url);
@@ -234,8 +237,8 @@ class CurlRestaurantsService
 
     }
 
-    public function GetCurlMenuLaPetitePausePrice(){
-        $curlResult = self::GetCurlMenuLaPetitePause()[1];
+    public function getCurlMenuLaPetitePausePrice(){
+        $curlResult = self::getCurlMenuLaPetitePause()[1];
         $dw = self::getDay();
         $menu = [];
 
@@ -245,7 +248,7 @@ class CurlRestaurantsService
         return($cleanMenu);
     }
 
-    public function GetCurlMenuLaCaveProfonde(){
+    public function getCurlMenuLaCaveProfonde(){
 
     }
 
