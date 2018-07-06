@@ -21,7 +21,7 @@ class CurlRestaurantsService
         3 => "Mercredi",
         4 => "Jeudi",
         5 => "Vendredi",
-        6 => "Plats" //Exception pour la fin de semaine à La Petite Pause
+        6 => "Plats" // Exception pour la fin de semaine à La Petite Pause
     ];
 
 
@@ -73,9 +73,9 @@ class CurlRestaurantsService
 
 
     public function getCurlMenuMarcheBiot(){
+        $dw = self::getDay();
         $url = 'http://sbiot.fr/accueil/plats-jour-de-semaine/';
         $curlResult = self::getUrlInfo($url);
-        $dw = self::getDay();
 
         $pregMatch = "/(?<=" . self::getDayMinusOneDay() . "<\/div><\/div><\/li><li class='odd'><div><p class='item-text'>)(.*?)(<\/p>)/";
 
@@ -99,8 +99,8 @@ class CurlRestaurantsService
     }
 
     public function getCurlMenuMarcheBiotVege(){
-        $curlResult = self::getCurlMenuMarcheBiot()[1];
         $dw = self::getDay();
+        $curlResult = self::getCurlMenuMarcheBiot()[1];
         // Debug
 //         $dw = "Jeudi";
 
@@ -117,7 +117,6 @@ class CurlRestaurantsService
 
     public function getCurlMarcheBiotPrice(){
         $curlResult = self::getCurlMenuMarcheBiot()[1];
-        $dw = self::getDay();
 
         preg_match_all(
             "/(?<=div class='value-col value-1'>)(.*?)(?=<\/div><div class='value-col value-2'>)/",
@@ -250,6 +249,15 @@ class CurlRestaurantsService
 
     public function getCurlMenuLaCaveProfonde(){
 
+    }
+
+    public function caseWeekEnd(){
+        $dw = self::getDay();
+//        $dw = "Dimanche";
+
+        if($dw == "Samedi" || $dw == "Dimanche"){
+            return true;
+        }
     }
 
 }

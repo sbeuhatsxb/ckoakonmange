@@ -18,6 +18,16 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class UpdateRestaurantsService
 {
+    CONST DAYS = [
+        1 => "Lundi",
+        2 => "Mardi",
+        3 => "Mercredi",
+        4 => "Jeudi",
+        5 => "Vendredi",
+        6 => "Samedi",
+        7 => "Dimanche"
+    ];
+
     /**
      * @var RestaurantRepository
      */
@@ -38,62 +48,110 @@ class UpdateRestaurantsService
      * @return void
      * @throws EntityNotFoundException if some restaurant were not found
      */
-    public function updateAllRestaurants($toRefresh = false)
+    public function updateAllRestaurants($caseWeekEnd, $toRefresh = false)
     {
         $restaurantTab = ['Le K','Les Hirondelles','La Petite Pause','Marché Biot', 'Air Bagel', 'Papa Ciccio'];
 
         foreach($restaurantTab as $restaurantFromTab) {
 
-            unset($restaurant);
-            $restaurant = $this->restaurantRepository->findOneByName($restaurantFromTab) ;
+            if(!$caseWeekEnd){
+                unset($restaurant);
+                $restaurant = $this->restaurantRepository->findOneByName($restaurantFromTab);
 
-            if (!$restaurant) {
-                throw new EntityNotFoundException('No product found for' . $restaurantFromTab);
-            }
-
-            $lastGlobalUpdate = $this->lastUpdateRepository->findAll();
-            $firstDate = $lastGlobalUpdate[0]->getLastGlobalRefresh()->format('Y-m-d');
-            $secondDate = new \DateTime;
-            $secondDate = $secondDate->format('Y-m-d');
-
-            if ((!($firstDate  == $secondDate)) || $toRefresh) {
-
-                $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
-
-                switch ($restaurantFromTab){
-                    case 'Le K' :
-                        $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLeK());
-                        break;
-                    case 'Les Hirondelles':
-                        $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLesHirondelles()[0]);
-                        break;
-                    case 'La Petite Pause':
-                        $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause()[0]);
-                        $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice());
-                        break;
-                    case 'Marché Biot':
-                        $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiot()[0]);
-                        $restaurant->setVeganTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiotVege());
-                        $restaurant->setPrice(CurlRestaurantsService::getCurlMarcheBiotPrice());
-                        break;
-                    case 'Air Bagel' :
-                        $restaurant->setLastUpdate(New \DateTime());
-                        break;
-                    case 'Papa Ciccio' :
-                        $restaurant->setLastUpdate(New \DateTime());
-
-                        break;
+                if (!$restaurant) {
+                    throw new EntityNotFoundException('No product found for' . $restaurantFromTab);
                 }
 
+                $lastGlobalUpdate = $this->lastUpdateRepository->findAll();
+                $firstDate = $lastGlobalUpdate[0]->getLastGlobalRefresh()->format('Y-m-d');
+                $secondDate = new \DateTime;
+                $secondDate = $secondDate->format('Y-m-d');
+
+                if ((!($firstDate  == $secondDate)) || $toRefresh) {
+
+                    $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
+
+                    switch ($restaurantFromTab) {
+                        case 'Le K' :
+                            $restaurant->setLastUpdate(New \DateTime());
+                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLeK());
+                            break;
+                        case 'Les Hirondelles':
+                            $restaurant->setLastUpdate(New \DateTime());
+                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLesHirondelles()[0]);
+                            break;
+                        case 'La Petite Pause':
+                            $restaurant->setLastUpdate(New \DateTime());
+                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause()[0]);
+                            $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice());
+                            break;
+                        case 'Marché Biot':
+                            $restaurant->setLastUpdate(New \DateTime());
+                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiot()[0]);
+                            $restaurant->setVeganTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiotVege());
+                            $restaurant->setPrice(CurlRestaurantsService::getCurlMarcheBiotPrice());
+                            break;
+                        case 'Air Bagel' :
+                            $restaurant->setTodaySpecial("
+                                Salade ou Bagel.
+                                Plus de détails sur le site...
+                                ");
+                            $restaurant->setLastUpdate(New \DateTime());
+                            break;
+                        case 'Papa Ciccio' :
+                            $restaurant->setLastUpdate(New \DateTime());
+                            break;
+                    }
+                    $this->restaurantRepository->save($restaurant);
+                }
+            } else {
+                $lastGlobalUpdate = $this->lastUpdateRepository->findAll();
+                $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
+
+                $restaurant = $this->restaurantRepository->findOneByName($restaurantFromTab);
+                $restaurant->setTodaySpecial("Pas de plat du jour le week-end ! Revenez nous voir lundi !");
                 $this->restaurantRepository->save($restaurant);
             }
         }
     }
 
+    /**
+     * @return LastUpdateRepository
+     */
+    public function getLastUpdateToDisplay()
+    {
+        $lastGlobalUpdate = $this->lastUpdateRepository->findAll();
+
+
+        $lastUpdate = $lastGlobalUpdate[0]->getLastGlobalRefresh();
+        $now = new \DateTime;
+        $nowCalendar = $now->format('Y-m-d');
+
+        $interval = $lastUpdate->diff($now);
+
+//        //Returns "Aujourd'hui"
+        if ($lastUpdate->format('Y-m-d') == $nowCalendar) {
+            return "Aujourd'hui à " . $lastUpdate->format('H:i');;
+        }
+
+        //Returns "Hier"
+        if ($interval->format('%a') == 1){
+            return "Hier";
+        }
+
+        //Returns "$day dernier"
+        if ($interval->format('%a') <= 7){
+            $dayInLetters = $lastUpdate->format('N');
+            return self::DAYS[$dayInLetters] . " dernier";
+        }
+
+        //Returns "la semaine dernière"
+        if ($interval->format('%a') > 7){
+            return "Il y a plus d'une smeaine";
+        }
+
+
+    }
 
 //    Methods to update one restaurant :
 

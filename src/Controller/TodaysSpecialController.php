@@ -23,11 +23,14 @@ class TodaysSpecialController extends Controller
 //        $this->updateLeK();
 //        $this->updateLPP();
 //        $this->updateLH();
-        if(@$_POST['refresh'] == "refreshed"){
+        $lastUpdateToDisplay = $restaurantsService->getLastUpdateToDisplay();
+
+        $caseWeekEnd = CurlRestaurantsService::caseWeekend();
+        if(@$_POST['refresh'] == "refreshed" && $caseWeekEnd == false){
             $toRefresh = true;
-            $restaurantsService->updateAllRestaurants($toRefresh);
+            $restaurantsService->updateAllRestaurants($caseWeekEnd, $toRefresh);
         } else {
-            $restaurantsService->updateAllRestaurants();
+            $restaurantsService->updateAllRestaurants($caseWeekEnd);
         }
 
         $restaurants = $this->getDoctrine()
@@ -39,14 +42,13 @@ class TodaysSpecialController extends Controller
 
         $entityManager = $this->getDoctrine()->getManager();
         $lastGlobalUpdate = $entityManager->getRepository(LastUpdate::class)->findAll();
-        $lastGlobalUpdate = $lastGlobalUpdate[0]->getLastGlobalRefresh()->format('H:i');
 
 
         return $this->render('todays_special/index.html.twig', [
             'controller_name' => 'TodaysSpecialController',
             'restaurants' => $restaurants,
             'weekDay' => $weekday,
-            'lastGlobalUpdate' => $lastGlobalUpdate,
+            'lastUpdateToDisplay' => $lastUpdateToDisplay,
         ]);
     }
 
