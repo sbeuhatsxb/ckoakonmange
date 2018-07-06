@@ -56,28 +56,28 @@ class UpdateRestaurantsService
             $secondDate = new \DateTime;
             $secondDate = $secondDate->format('Y-m-d');
 
-            if ((!($firstDate  == $secondDate)) || $toRefresh) { // TODO: $toRefresh = (@$_POST['refresh'] == "refreshed")
+            if ((!($firstDate  == $secondDate)) || $toRefresh) {
 
                 $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
 
                 switch ($restaurantFromTab){
                     case 'Le K' :
                         $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::leK());
+                        $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuLeK());
                         break;
                     case 'Les Hirondelles':
                         $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::lesHirondelles()[0]);
+                        $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuLesHirondelles()[0]);
                         break;
                     case 'La Petite Pause':
                         $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::laPetitePause()[0]);
-                        $restaurant->setPrice(CurlRestaurantsService::laPetitePausePrice());
+                        $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuLaPetitePause()[0]);
+                        $restaurant->setPrice(CurlRestaurantsService::GetCurlMenuLaPetitePausePrice());
                         break;
                     case 'Marché Biot':
                         $restaurant->setLastUpdate(New \DateTime());
-                        $restaurant->setTodaySpecial(CurlRestaurantsService::marcheBiot()[0]);
-                        $restaurant->setVeganTodaySpecial(CurlRestaurantsService::marcheBiotVege()[0]);
+                        $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuMarcheBiot()[0]);
+                        $restaurant->setVeganTodaySpecial(CurlRestaurantsService::GetCurlMenuMarcheBiotVege()[0]);
                         $restaurant->setPrice(CurlRestaurantsService::marcheBiotPrice());
                         break;
                     case 'Air Bagel' :
@@ -114,8 +114,8 @@ class UpdateRestaurantsService
 //
 //        if (!($firstDate == $secondDate)){
 //            $restaurant->setLastUpdate(new \DateTime());
-//            $restaurant->setTodaySpecial(CurlRestaurantsService::marcheBiot()[0]);
-//            $restaurant->setVeganTodaySpecial(CurlRestaurantsService::marcheBiotVege()[0]);
+//            $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuMarcheBiot()[0]);
+//            $restaurant->setVeganTodaySpecial(CurlRestaurantsService::GetCurlMenuMarcheBiotVege()[0]);
 //            $restaurant->setPrice(CurlRestaurantsService::marcheBiotPrice());
 //            $entityManager->flush();
 //        } else {
@@ -140,7 +140,7 @@ class UpdateRestaurantsService
 //        $secondDate = $secondDate->format('Y-m-d');
 //        if (!($firstDate == $secondDate)){
 //            $restaurant->setLastUpdate(new \DateTime());
-//            $restaurant->setTodaySpecial(CurlRestaurantsService::leK()[0]);
+//            $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuLeK()[0]);
 //            $entityManager->flush();
 //        } else {
 //            return null;
@@ -164,8 +164,8 @@ class UpdateRestaurantsService
 //        $secondDate = $secondDate->format('Y-m-d');
 //        if (!($firstDate == $secondDate)){
 //            $restaurant->setLastUpdate(new \DateTime());
-//            $restaurant->setTodaySpecial(CurlRestaurantsService::laPetitePause()[0]);
-//            $restaurant->setPrice(CurlRestaurantsService::laPetitePausePrice());
+//            $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuLaPetitePause()[0]);
+//            $restaurant->setPrice(CurlRestaurantsService::GetCurlMenuLaPetitePausePrice());
 //            $entityManager->flush();
 //        } else {
 //            return null;
@@ -189,7 +189,7 @@ class UpdateRestaurantsService
 //        $secondDate = $secondDate->format('Y-m-d');
 //        if (!($firstDate == $secondDate)){
 //            $restaurant->setLastUpdate(new \DateTime());
-//            $restaurant->setTodaySpecial(CurlRestaurantsService::lesHirondelles()[0]);
+//            $restaurant->setTodaySpecial(CurlRestaurantsService::GetCurlMenuLesHirondelles()[0]);
 //            $entityManager->flush();
 //        } else {
 //            return null;
