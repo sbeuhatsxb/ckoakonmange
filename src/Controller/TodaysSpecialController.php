@@ -40,10 +40,6 @@ class TodaysSpecialController extends Controller
 
         $weekday = strtolower(CurlRestaurantsService::getDay());
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $lastGlobalUpdate = $entityManager->getRepository(LastUpdate::class)->findAll();
-
-
         return $this->render('todays_special/index.html.twig', [
             'controller_name' => 'TodaysSpecialController',
             'restaurants' => $restaurants,

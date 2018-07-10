@@ -105,7 +105,9 @@
                     </a>
                     <p class="post-meta">Cuisiné par
                         <a href="#">Hungry bot</a>
-                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }} -
+                        {#ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }} -#}
+                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date('H:i') }} -
+
                         <a href="{{ restaurant.mappy }}" target="_blank" class="color:#1E90FF">
                             Voir la carte
                     <span class="fa-stack fa-lg color:#1E90FF">

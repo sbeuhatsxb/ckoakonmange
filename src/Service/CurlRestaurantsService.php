@@ -77,7 +77,12 @@ class CurlRestaurantsService
         $url = 'http://sbiot.fr/accueil/plats-jour-de-semaine/';
         $curlResult = self::getUrlInfo($url);
 
-        $pregMatch = "/(?<=" . self::getDayMinusOneDay() . "<\/div><\/div><\/li><li class='odd'><div><p class='item-text'>)(.*?)(<\/p>)/";
+//        $firstPregMatch = "/(?<=" . self::getDayMinusOneDay() . ")([^)]+)(?=" . strtolower(getDay()) . ")/";
+//        $secondPregMatch = "/(?<=<li class='odd'><div><p class='item-text'>)([^)]+)(?=</p><p class='desc'>)/";
+//        preg_match_all($firstPregMatch, $curlResult, $buffer);
+//        preg_match_all($secondPregMatch, $buffer,$menu);
+
+        //        "/(?<=" . self::getDayMinusOneDay() . "<\/div><\/div><\/li><li class='odd'><div><p class='item-text'>)(.*?)(<\/p>)/";
 
         $menu = [];
 
@@ -89,9 +94,13 @@ class CurlRestaurantsService
                 return(array($menu[1]["Une erreur est survenue lors du traitement"], $curlResult));
             }
         } else {
-            preg_match_all($pregMatch, $curlResult, $menu);
+            $firstPregMatch = "/(?<=" . self::getDayMinusOneDay() . ")([^)]+)(?=" . self::getDay() . ")/";
+            $secondPregMatch = "/(?<=<li class='odd'><div><p class='item-text'>)([^)]+)(?=<\/p><p class='desc'>)/";
+            preg_match_all($firstPregMatch, $curlResult, $buffer);
+            preg_match_all($secondPregMatch, $buffer[0][0],$menu);
+
             if(!empty($menu)){
-                return(array(iconv("UTF-8", "UTF-8//IGNORE",$menu[1][0]), $curlResult));
+                return(array(iconv("UTF-8", "UTF-8//IGNORE",@$menu[1][0]), $curlResult));
             } else {
                 return(array($menu[0]["Une erreur est survenue lors du traitement"], $curlResult));
             }
@@ -102,17 +111,17 @@ class CurlRestaurantsService
         $dw = self::getDay();
         $curlResult = self::getCurlMenuMarcheBiot()[1];
         // Debug
-//         $dw = "Jeudi";
+        // $dw = "Jeudi";
 
         $pregMatch = "/(?=". $dw ."<\/div><\/div><\/li><li class='even'><div><p class='item-text'>).+?(?=<\/p><p class='desc'><img src=)/";
-        $trim = ":" . $dw . "</div></div></li><li class='even'><div><p class='item-text'>";
+        $secondPregMatch = "/(?<=" . $dw . "<\/div><\/div><\/li><li class='even'><div><p class='item-text'>).*/";
+        preg_match_all($pregMatch, $curlResult, $buffer);
+        preg_match_all($secondPregMatch,$buffer[0][0], $menu);
 
-        preg_match_all($pregMatch,$curlResult, $menu);
         if($menu != null) {
             $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", (@$menu[0][0]));
         }
-
-        return(trim($cleanMenu, $trim));
+        return($cleanMenu);
     }
 
     public function getCurlMarcheBiotPrice(){
@@ -136,9 +145,9 @@ class CurlRestaurantsService
 
         $secondPregMatch = "/(?<=<p>)(.*)(?=)/";
         //        var_export($menu[0]);
-        preg_match_all($secondPregMatch, $menu[0][0], $menu);
+        preg_match_all($secondPregMatch, @$menu[0][0], $menu);
 
-        $cleanMenu = $menu[0][0];
+        $cleanMenu = @$menu[0][0];
 
         $cleaningMenu = ["<br />", "<br/>", "<br>", "<br...", "</p>"];
         foreach ($cleaningMenu as $cleanse){
