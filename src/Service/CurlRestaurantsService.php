@@ -140,18 +140,16 @@ class CurlRestaurantsService
         $url = 'https://www.leshirondelles.fr/';
         $curlResult = self::getUrlInfo($url);
 
-        $firstPregMatch = '/(?<=<h2>Le Menu du jour<\/h2>)([^)]+)(?=a href="https:\/\/www.leshirondelles.fr)/';
+        $firstPregMatch = '/(?<=<h2>Le Menu du jour<\/h2>)(.*)(?=<\/p>)/s';
         preg_match_all($firstPregMatch, $curlResult, $menu);
-
-        $secondPregMatch = "/(?<=<p>)(.*)(?=)/";
-        //        var_export($menu[0]);
+        $secondPregMatch = "/(?<=<p>)(.*)(?=<\/p>)/";
         preg_match_all($secondPregMatch, @$menu[0][0], $menu);
 
         $cleanMenu = @$menu[0][0];
 
-        $cleaningMenu = ["<br />", "<br/>", "<br>", "<br...", "</p>"];
+        $cleaningMenu = ["<br />", "<br/>", "<br>", "<br..."];
         foreach ($cleaningMenu as $cleanse){
-            $cleanMenu = str_replace($cleanse,"", $cleanMenu);
+            $cleanMenu = str_replace($cleanse," - ", $cleanMenu);
         }
 
         return(array(iconv("UTF-8", "UTF-8//IGNORE",$cleanMenu), $curlResult));

@@ -104,9 +104,9 @@
 
                     </a>
                     <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
+                        <a href="#">Hungry bot.</a>
                         {#ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }} -#}
-                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date('H:i') }} -
+                        Mis à jour : {{ lastUpdateToDisplay }} -
 
                         <a href="{{ restaurant.mappy }}" target="_blank" class="color:#1E90FF">
                             Voir la carte
