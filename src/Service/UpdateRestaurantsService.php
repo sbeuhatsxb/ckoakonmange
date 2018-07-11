@@ -8,6 +8,7 @@
 
 namespace App\Service;
 use App\Entity\LastUpdate;
+use App\Entity\Restaurant;
 use App\Repository\LastUpdateRepository;
 use App\Repository\RestaurantRepository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -50,16 +51,40 @@ class UpdateRestaurantsService
      */
     public function updateAllRestaurants($caseWeekEnd, $toRefresh = false)
     {
-        $restaurantTab = ['Le K','Les Hirondelles','La Petite Pause','Marché Biot', 'Air Bagel', 'Papa Ciccio'];
+        //Important : these names and methods in CurlRestaurantsService must be the same (and without spaces!)
+        $restaurantTab = [
+            'Le K',
+            'Les Hirondelles',
+            'La Petite Pause',
+            'Marché Biot',
+            'Air Bagel',
+            'Papa Ciccio',
+            'La Cave Profonde'
+        ];
 
         foreach($restaurantTab as $restaurantFromTab) {
 
             if(!$caseWeekEnd){
                 unset($restaurant);
                 $restaurant = $this->restaurantRepository->findOneByName($restaurantFromTab);
-
                 if (!$restaurant) {
-                    throw new EntityNotFoundException('No product found for' . $restaurantFromTab);
+                    $restaurant = new Restaurant();
+                    $restaurantFromTab = str_replace(' ','', $restaurantFromTab);
+                    $functionName = "getCurlMenu" . $restaurantFromTab;
+
+                    //            $name, [0]
+                    //            $cleanMenu), // [1]
+                    //            $url, // [2]
+                    //            $mappy, // [3]
+                    //            $price, // [4]
+                    $restaurant->setName(CurlRestaurantsService::$functionName()[0]);
+                    $restaurant->setTodaySpecial(CurlRestaurantsService::$functionName()[1]);
+                    $restaurant->setUrl(CurlRestaurantsService::$functionName()[2]);
+                    $restaurant->setMappy(CurlRestaurantsService::$functionName()[3]);
+                    $restaurant->setPrice(CurlRestaurantsService::$functionName()[4]);
+                    $restaurant->setLastUpdate(New \DateTime());
+
+                    $this->restaurantRepository->save($restaurant);
                 }
 
                 $lastGlobalUpdate = $this->lastUpdateRepository->findAll();
@@ -72,34 +97,38 @@ class UpdateRestaurantsService
                     $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
 
                     switch ($restaurantFromTab) {
-                        case 'Le K' :
+                        case 'LeK' :
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLeK());
                             break;
-                        case 'Les Hirondelles':
+                        case 'LesHirondelles':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLesHirondelles()[0]);
                             break;
-                        case 'La Petite Pause':
+                        case 'LaPetitePause':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause()[0]);
                             $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice());
                             break;
-                        case 'Marché Biot':
+                        case 'MarchéBiot':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiot()[0]);
                             $restaurant->setVeganTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiotVege());
                             $restaurant->setPrice(CurlRestaurantsService::getCurlMarcheBiotPrice());
                             break;
-                        case 'Air Bagel' :
+                        case 'AirBagel' :
                             $restaurant->setTodaySpecial("
                                 Salade ou Bagel.
                                 Plus de détails sur le site...
                                 ");
                             $restaurant->setLastUpdate(New \DateTime());
                             break;
-                        case 'Papa Ciccio' :
+                        case 'PapaCiccio' :
                             $restaurant->setLastUpdate(New \DateTime());
+                            break;
+                        case 'LaCaveProfonde':
+                            $restaurant->setLastUpdate(New \DateTime());
+                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaCaveProfonde()[1]);
                             break;
                     }
                     $this->restaurantRepository->save($restaurant);

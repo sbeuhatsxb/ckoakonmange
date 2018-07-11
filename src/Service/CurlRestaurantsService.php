@@ -255,8 +255,62 @@ class CurlRestaurantsService
     }
 
     public function getCurlMenuLaCaveProfonde(){
+        $url = 'http://www.lacaveprofonde.fr/menu/';
+        $curlResult = self::getUrlInfo($url);
 
+        $firstPregMatch = '/(?<=express)(.*)(?=<!-- \/module service menu -->)/s';
+        preg_match_all($firstPregMatch, $curlResult, $menu);
+        $secondPregMatch = '/(?<=<div class=\"tb-menu-description\">)(.*)(?=<\/div><!-- .tb-image-content -->)/s';
+        preg_match_all($secondPregMatch, @$menu[0][0], $menu);
+        $thirdPregMatch = '/(.*)(?=<!-- \/module service menu -->)/s';
+        preg_match_all($thirdPregMatch, @$menu[0][0], $menu);
+        $fourthPregMatch = '/(.*)(?=<\/div><!-- .tb-image-content -->)/s';
+        preg_match_all($fourthPregMatch, @$menu[0][0], $menu);
+        $fifthPregMatch = '/(.*)(?=<\/div>)/s';
+        preg_match_all($fifthPregMatch, @$menu[0][0], $menu);
+
+        $cleanMenu = ltrim(@$menu[0][0]);
+        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", $cleanMenu);
+
+        $mappy = "https://www.google.fr/maps/dir/11+Rue+de+la+Haye,+67300+Schiltigheim/103+Route+du+G%C3%A9n%C3%A9ral+de+Gaulle,+67300+Schiltigheim/@48.6109809,7.712015,15z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x4796b7faf9ee309b:0x9e701574a35ae206!2m2!1d7.708453!2d48.6143336!1m5!1m1!1s0x4796c813da54f5f5:0x1b3039173f6863eb!2m2!1d7.735702!2d48.6069599!3e0";
+        $name = "La Cave Profonde";
+        $price = "14,90 €";
+
+        return(array(
+            $name, // [0]
+            $cleanMenu, // [1]
+            $url, // [2]
+            $mappy, // [3]
+            $price, // [4]
+        ));
     }
+
+        public function getCurlMenuModel(){
+            $url = 'http://www.model.com';
+            $mappy = "https://www.google.fr/maps/dir/11+Rue+de+la+Haye";
+            $name = "model_name";
+            $price = "14,90 €";
+
+            $curlResult = self::getUrlInfo($url);
+
+            $firstPregMatch = '/(?<=model)(.*)(?=model)/s';
+            preg_match_all($firstPregMatch, $curlResult, $menu);
+            $secondPregMatch = '/(?<=model)(.*)(?=model)/s';;
+            preg_match_all($secondPregMatch, @$menu[0][0], $menu);
+//            If needed :
+            $cleanMenu = ltrim(@$menu[0][0]);
+            $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", $cleanMenu);
+
+            return(array(
+                $name, // [0]
+                $cleanMenu, // [1]
+                $url, // [2]
+                $mappy, // [3]
+                $price, // [4]
+            ));
+    }
+
+
 
     public function caseWeekEnd(){
         $dw = self::getDay();
