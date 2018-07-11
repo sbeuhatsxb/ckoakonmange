@@ -131,7 +131,7 @@ class UpdateRestaurantsService
 
 //        //Returns "Aujourd'hui"
         if ($lastUpdate->format('Y-m-d') == $nowCalendar) {
-            return "Aujourd'hui à " . $lastUpdate->format('H:i');;
+            return "aujourd'hui à " . $lastUpdate->format('H:i');;
         }
 
         //Returns "Hier"
