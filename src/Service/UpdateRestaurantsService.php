@@ -93,40 +93,40 @@ class UpdateRestaurantsService
                 $secondDate = $secondDate->format('Y-m-d');
 
                 if ((!($firstDate  == $secondDate)) || $toRefresh) {
-
+                    dump($toRefresh);
                     $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
 
                     switch ($restaurantFromTab) {
-                        case 'LeK' :
+                        case 'Le K' :
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLeK());
                             break;
-                        case 'LesHirondelles':
+                        case 'Les Hirondelles':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLesHirondelles()[0]);
                             break;
-                        case 'LaPetitePause':
+                        case 'La PetitePause':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause()[0]);
                             $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice());
                             break;
-                        case 'MarchéBiot':
+                        case 'Marché Biot':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiot()[0]);
                             $restaurant->setVeganTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiotVege());
                             $restaurant->setPrice(CurlRestaurantsService::getCurlMarcheBiotPrice());
                             break;
-                        case 'AirBagel' :
+                        case 'Air Bagel' :
                             $restaurant->setTodaySpecial("
                                 Salade ou Bagel.
                                 Plus de détails sur le site...
                                 ");
                             $restaurant->setLastUpdate(New \DateTime());
                             break;
-                        case 'PapaCiccio' :
+                        case 'Papa Ciccio' :
                             $restaurant->setLastUpdate(New \DateTime());
                             break;
-                        case 'LaCaveProfonde':
+                        case 'La Cave Profonde':
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaCaveProfonde()[1]);
                             break;
