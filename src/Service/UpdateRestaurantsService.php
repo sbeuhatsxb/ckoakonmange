@@ -93,7 +93,6 @@ class UpdateRestaurantsService
                 $secondDate = $secondDate->format('Y-m-d');
 
                 if ((!($firstDate  == $secondDate)) || $toRefresh) {
-                    dump($toRefresh);
                     $lastGlobalUpdate[0]->setLastGlobalRefresh(New \DateTime());
 
                     switch ($restaurantFromTab) {

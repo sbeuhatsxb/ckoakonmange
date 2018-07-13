@@ -116,7 +116,7 @@ class CurlRestaurantsService
         $pregMatch = "/(?=". $dw ."<\/div><\/div><\/li><li class='even'><div><p class='item-text'>).+?(?=<\/p><p class='desc'><img src=)/";
         $secondPregMatch = "/(?<=" . $dw . "<\/div><\/div><\/li><li class='even'><div><p class='item-text'>).*/";
         preg_match_all($pregMatch, $curlResult, $buffer);
-        preg_match_all($secondPregMatch,$buffer[0][0], $menu);
+        preg_match_all($secondPregMatch,@$buffer[0][0], $menu);
 
         if($menu != null) {
             $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", (@$menu[0][0]));
@@ -131,7 +131,7 @@ class CurlRestaurantsService
             "/(?<=div class='value-col value-1'>)(.*?)(?=<\/div><div class='value-col value-2'>)/",
             $curlResult, $menu);
 
-        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE",$menu[0][0]);
+        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", @$menu[0][0]);
 
         return($cleanMenu);
     }
@@ -163,7 +163,7 @@ class CurlRestaurantsService
         $end = self::getDayOfTheWeek($dw+1);
 
         preg_match_all("/(?<=<meta name=\"twitter:description\" content=\")(.*?)(?=\/>)/", $curlResult, $menu);
-        $weekMenuArray = explode(" ", $menu[0][0]);
+        $weekMenuArray = explode(" ", @$menu[0][0]);
 
         /* On parse le résultat du pregmatch avec comme critère le jour de la semaine afin de récupérer le nom du plat indiqué
         entre les deux jours*/
@@ -193,7 +193,7 @@ class CurlRestaurantsService
             $cleanMenu = mb_ereg_replace($cleanse,"", $cleanMenu);
         }
 
-        return iconv("UTF-8", "UTF-8//IGNORE",$cleanMenu);
+        return iconv("UTF-8", "UTF-8//IGNORE", $cleanMenu);
 
     }
 
