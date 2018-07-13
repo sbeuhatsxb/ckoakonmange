@@ -7,6 +7,7 @@ use App\Entity\LastUpdate;
 use App\Repository\RestaurantRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use App\Service\CurlRestaurantsService;
 
 class AppFixtures extends Fixture
 {
@@ -21,9 +22,9 @@ class AppFixtures extends Fixture
 
         $restaurant = new Restaurant();
         $restaurant->setName('Marché Biot');
-        $restaurant->setTodaySpecial(RestaurantRepository::marcheBiot()[0]);
-        $restaurant->setVeganTodaySpecial(RestaurantRepository::marcheBiotVege()[0]);
-        $restaurant->setPrice(RestaurantRepository::marcheBiotPrice());
+        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiot()[0]);
+        $restaurant->setVeganTodaySpecial(CurlRestaurantsService::getCurlMenuMarcheBiotVege()[0]);
+        $restaurant->setPrice(CurlRestaurantsService::getCurlMarcheBiotPrice());
         $restaurant->setLastUpdate($date);
         $restaurant->setUrl('http://sbiot.fr/accueil/plats-jour-de-semaine/');
         $restaurant->setMappy('https://www.google.fr/maps/dir/48.6144167,7.7087412/March%C3%A9+Frais+de+St%C3%A9phane+Biot,+51+Rue+de+Strasbourg,+67206+Mittelhausbergen/@48.6120922,7.7009841,17z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x4796b7e8b96b27a5:0x5629eff44b35cd22!2m2!1d7.6987196!2d48.6097677!3e3!5m1!1e1');
@@ -31,7 +32,7 @@ class AppFixtures extends Fixture
 
         $restaurant = new Restaurant();
         $restaurant->setName('Le K');
-        $restaurant->setTodaySpecial(RestaurantRepository::leK());
+        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLeK());
         $restaurant->setPrice('12,80 €');
         $restaurant->setLastUpdate($date);
         $restaurant->setUrl('https://www.restaurant-le-k.com/a-table/');
@@ -40,8 +41,8 @@ class AppFixtures extends Fixture
 
         $restaurant = new Restaurant();
         $restaurant->setName('La Petite Pause');
-        $restaurant->setTodaySpecial(RestaurantRepository::laPetitePause()[0]);
-        $restaurant->setPrice(RestaurantRepository::laPetitePausePrice());
+        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause()[0]);
+        $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice());
         $restaurant->setLastUpdate($date);
         $restaurant->setUrl('http://www.lapetitepause.fr/');
         $restaurant->setMappy('https://www.google.fr/maps/dir/48.6144167,7.7087412/La+Petite+Pause+Schiltigheim,+Rue+Alfred+Kastler,+Schiltigheim/@48.6124495,7.7124531,17z/data=!3m1!4b1!4m10!4m9!1m1!4e1!1m5!1m1!1s0x4796c81d207fde15:0x47ddda0880f8dd3!2m2!1d7.720553!2d48.610507!3e3!5m1!1e1');
@@ -49,7 +50,7 @@ class AppFixtures extends Fixture
 
         $restaurant = new Restaurant();
         $restaurant->setName('Les Hirondelles');
-        $restaurant->setTodaySpecial(RestaurantRepository::lesHirondelles()[0]);
+        $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLesHirondelles()[0]);
         $restaurant->setPrice("7,40€");
         $restaurant->setLastUpdate($date);
         $restaurant->setUrl('https://www.leshirondelles.fr/');

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} Hello {{ controller_name }}!{% endblock %}
+{% block title %} Cékoakonmange?!{% endblock %}
 
 {% block body %}
 
@@ -24,9 +24,8 @@
                         </form>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link"> dernière mise à jour : {{ lastGlobalUpdate }}</a>
+                        <a class="nav-link"> dernière mise à jour : {{ lastUpdateToDisplay }} </a>
                     </li>
-
                     {#<li class="nav-item">#}
                       {#<a class="nav-link" href="contact.html">Contact</a>#}
                     {#</li>#}
@@ -56,31 +55,32 @@
             <div class="col-lg-8 col-md-10 mx-auto">
 
                 {% for restaurant in restaurants %}
-                <hr>
 
                 <div class="post-preview">
                     <a href="{{ restaurant.url }}" target="_blank">
-                        <h2 class="post-title">
-                        </h2>
                         <h3 class="post-subtitle">
                         {% if restaurant.name != "Papa Ciccio" %}
 
 
-                        <h2 class="post-title">
-                            {{ restaurant.name }} - {{ restaurant.price }}
-                        </h2>
-                        <h3 class="post-subtitle">{{ restaurant.todayspecial }}
+                        <h3 class="post-title">
+                            {{ restaurant.name }}
+                        </h3>
+                        <h4 class="post-subtitle">{{ restaurant.todayspecial }}
                             {% if restaurant.vegantodayspecial %}
                                 {% set stringLength = restaurant.vegantodayspecial | length %}
                                 {% if stringLength >= 4 %}
-                                    <br>{{ restaurant.vegantodayspecial }}
+                                    <br><p style="color: #339933;">Vege friendly : {{ restaurant.vegantodayspecial }}</p>
                                 {% endif %}
 
                             {% endif %}
                             {#Except div for Papa Ciccio#}
                             {% else %}
-                                <span>Les pâtes :</span><p>Farfale, Fusilli, Penne, Spaghetti</p><br/><br/>
-                                <span>Les sauces :</span>
+                                <h3 class="post-title">
+                                    Papa Ciccio
+                                </h3>
+                                <h5>Les pâtes :</h5>
+                                <p>Farfale, Fusilli, Penne, Spaghetti</p>
+                                <h5>Les sauces :</h5>
                                 <p>3 fromages<br/>
                                     Arrabiatta<br/>
                                     Aurora<br/>
@@ -92,35 +92,37 @@
                                     Piccantina<br/>
                                     Poulet Curry / Oignon / Poivre / Moutarde<br/>
                                     Poulet Méditerranéene (don't ask) / Champignons noirs<br/>
-                                    Saumon crème</p><br/><br/>
-                                <span>Les fromages :</span><p> emmental, parmigiano</p><br/><br/>
-
-                                03 88 83 20 08
-                                </p>
+                                    Saumon crème</p>
+                                <h5>Les fromages :</h5>
+                                <p> Emmental, parmigiano</p>
+                                <p>03 88 83 20 08</p>
                             {% endif %}
+                            </h4>
+                            <h5>{{ restaurant.price }}</h5>
                         </h3>
 
 
                     </a>
                     <p class="post-meta">Cuisiné par
-                        <a href="#">Hungry bot</a>
-                        ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }}
-                        <a href="{{ restaurant.mappy }}" target="_blank">
+                        <a href="#">Hungry bot.</a>
+                        {#ce {{ weekDay }} à {{ restaurant.lastUpdate|date("g", "Europe/Paris") }}h{{ restaurant.lastUpdate|date("i", "Europe/Paris") }} -#}
+                        Mis à jour : {{ lastUpdateToDisplay }} -
+
+                        <a href="{{ restaurant.mappy }}" target="_blank" class="color:#1E90FF">
+                            Voir la carte
                     <span class="fa-stack fa-lg color:#1E90FF">
-                      <i class="fa fa-circle fa-stack-1x"></i>
-                      <i class="fa fa-link fa-stack-1x fa-inverse"></i>
+                      <i class="fa fa fa-map-marker fa-stack-1x" aria-hidden="true"></i>
                     </span>
                         </a>
                     </p>
                 </div>
+                <hr>
                 {% endfor %}
 
 
             </div>
         </div>
     </div>
-
-    <!-- <hr> -->
 
     <!-- Footer -->
     <footer>
@@ -131,15 +133,14 @@
 
                         <li class="list-inline-item">
                             <a href="#">
-                  <span class="fa-stack fa-lg">
-                    <i class="fa fa-cog fa-spin fa-2x fa-fw"></i>
-                    <i class="sr-only"></i>
-                  </span>
+                              <span class="fa-stack fa-lg" style="color: #0085A1;">
+                                <i class="fa fa-cutlery fa-4x fa-fw"></i>
+                                <i class="sr-only"></i>
+                              </span>
                             </a>
                         </li>
 
                     </ul>
-                    <p class="copyright text-muted">Copyright &copy; Netapsys / Sodifrance / Antéo / On ne sait plus...</p>
                 </div>
             </div>
         </div>
