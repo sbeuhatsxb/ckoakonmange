@@ -10,6 +10,7 @@ use App\Entity\LastUpdate;
 use App\Service\CurlRestaurantsService;
 use App\Controller\UpdateRestaurantController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 
 class TodaysSpecialController extends Controller
@@ -17,20 +18,24 @@ class TodaysSpecialController extends Controller
     /**
      * @Route("/todays/special", name="todays_special")
      */
-    public function index(UpdateRestaurantsService $restaurantsService)
+    public function index(UpdateRestaurantsService $restaurantsService, Request $request)
     {
 //        $this->updateMb();
 //        $this->updateLeK();
 //        $this->updateLPP();
 //        $this->updateLH();
+        $locale = $request->getLocale();
+        $intl = new \IntlDateFormatter($request->getLocale(), \IntlDateFormatter::LONG, \IntlDateFormatter::NONE, null, null, 'd LLLL y');
+        $date = $intl->format(new \DateTime('now'));
         $lastUpdateToDisplay = $restaurantsService->getLastUpdateToDisplay();
 
         $caseWeekEnd = CurlRestaurantsService::caseWeekend();
         if(@$_POST['refresh'] == "refreshed" && $caseWeekEnd == false){
             $toRefresh = true;
-            $restaurantsService->updateAllRestaurants($caseWeekEnd, $toRefresh);
+            $restaurantsService->updateAllRestaurants($caseWeekEnd, $toRefresh, $date);
         } else {
-            $restaurantsService->updateAllRestaurants($caseWeekEnd);
+            $toRefresh = false;
+            $restaurantsService->updateAllRestaurants($caseWeekEnd, $toRefresh, $date);
         }
 
         $restaurants = $this->getDoctrine()

@@ -8,6 +8,8 @@
 
 namespace App\Service;
 
+use Symfony\Component\HttpFoundation\Request;
+
 
 class CurlRestaurantsService
 {
@@ -26,7 +28,7 @@ class CurlRestaurantsService
 
 
     public function getDayOfTheWeek($dw){
-        return self::DAYWEEK[$dw];
+        return self::DAYWEEK[@$dw];
     }
 
     /* return INT */
@@ -197,59 +199,44 @@ class CurlRestaurantsService
 
     }
 
-    public function getCurlMenuLaPetitePause(){
+    public function getCurlMenuLaPetitePause($date)
+    {
 
+        $dw = strtolower(self::getDay());
         $url = 'http://www.lapetitepause.fr/';
         $curlResult = self::getUrlInfo($url);
-        $dw = self::getIntDay();
-        $thisDay = self::getDayOfTheWeek($dw);
-        $end = self::getDayOfTheWeek($dw+1);
 
-        $tabMenu = [];
+        $firstPregMatch = '/(?<=<span>' . $dw . ')(.*)/';
+        preg_match_all($firstPregMatch, $curlResult, $menu);
+        //            If needed :
 
-        preg_match_all("/([A-Za-zàéèêœùïî\-\,]+)/", $curlResult, $menu);
+        $day = strtolower($date);
 
-        //reformatage du tableau $menu
-        $j =0;
-        foreach($menu[$j] as $key=>$value){
-            $tabMenu[] = $value;
-            $j++;
-        }
+        $cleanMenu = @$menu[0][0];
+        $cleanMenu = str_replace($day, "",  $cleanMenu);
+        $cleanMenu = str_replace(">: </span></span>", "", $cleanMenu);
+        $cleanMenu = str_replace('<span class=\\"lpp-made-by\\">', "  ", $cleanMenu);
+        $cleanMenu = str_replace(">: </span></span>", "", $cleanMenu);
+        $cleanMenu = str_replace("</li>", "", $cleanMenu);
+        $cleanMenu = str_replace("<span", "", $cleanMenu);
 
-        /*liste d'exclusion après le pregmatch*/
-        $badWords = ["li", "ul", "span", "lpp-made-by", "class", "href", "main-nav",
-            "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "aout", "septembre", "octobre", "décembre"];
 
-        /* On parse le résultat du pregmatch avec comme critère le jour de la semaine afin de récupérer le nom du plat indiqué
-        entre les deux jours*/
-        $newArray = [];
-        $i = 0;
-        $start = false;
-        foreach ($tabMenu as $element) {
-            if($start == true && !in_array($element, $badWords)){
-                $newArray[$i] = $element;
-                $i++;
-            }
-            if($element == $thisDay || $element == strtolower($thisDay)){
-                $start = true;
-            }
-            if($element == $end || $element == strtolower($end)){
-                $start = false;
-            }
-        }
-        $totalElemInArray = count($newArray);
-        unset($newArray[$totalElemInArray-1]);
-        return array(iconv("UTF-8", "UTF-8//IGNORE",implode($newArray, " ")), $curlResult);
+        $cleanMenu = ltrim($cleanMenu);
+        $cleanMenu = rtrim($cleanMenu);
+        $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE", $cleanMenu);
 
+        return (array(
+            $cleanMenu, // [1]
+            $curlResult
+        ));
     }
 
-    public function getCurlMenuLaPetitePausePrice(){
-        $curlResult = self::getCurlMenuLaPetitePause()[1];
+    public function getCurlMenuLaPetitePausePrice($date){
+        $curlResult = self::getCurlMenuLaPetitePause($date)[1];
         $dw = self::getDay();
         $menu = [];
 
         preg_match_all("/(?<=<h2>Notre Chef vous propose ses Plats du Jour à )(.*?)(?=<\/h2>)/", $curlResult, $menu);
-
         $cleanMenu = iconv("UTF-8", "UTF-8//IGNORE",$menu[0][0]);
         return($cleanMenu);
     }

@@ -49,7 +49,7 @@ class UpdateRestaurantsService
      * @return void
      * @throws EntityNotFoundException if some restaurant were not found
      */
-    public function updateAllRestaurants($caseWeekEnd, $toRefresh = false)
+    public function updateAllRestaurants($caseWeekEnd, $toRefresh = false, $date)
     {
         //Important : these names and methods in CurlRestaurantsService must be the same (and without spaces!)
         $restaurantTab = [
@@ -104,10 +104,10 @@ class UpdateRestaurantsService
                             $restaurant->setLastUpdate(New \DateTime());
                             $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLesHirondelles()[0]);
                             break;
-                        case 'La PetitePause':
+                        case 'La Petite Pause':
                             $restaurant->setLastUpdate(New \DateTime());
-                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause()[0]);
-                            $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice());
+                            $restaurant->setTodaySpecial(CurlRestaurantsService::getCurlMenuLaPetitePause($date)[0]);
+                            $restaurant->setPrice(CurlRestaurantsService::getCurlMenuLaPetitePausePrice($date));
                             break;
                         case 'Marché Biot':
                             $restaurant->setLastUpdate(New \DateTime());
